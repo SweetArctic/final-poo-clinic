@@ -4,35 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Clínica - Dashboard</title>
-  <style>
-    :root { --bg:#0f172a; --panel:#111827; --panel2:#1e293b; --border:#334155; --text:#e2e8f0; --link:#93c5fd; --accent:#22c55e; --danger:#ef4444; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
-    header { padding: 24px; background: var(--panel2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-    main { padding: 24px; }
-    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-    a { color: var(--link); text-decoration: none; }
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-    .tab { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--panel); }
-    .tab.active { background: var(--panel2); }
-    .hidden { display: none; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; }
-    input, select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); color: var(--text); }
-    button { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel2); color: var(--text); cursor: pointer; }
-    .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .actions { display: flex; gap: 8px; }
-    .ok { background: var(--accent); border-color: var(--accent); }
-    .ko { background: var(--danger); border-color: var(--danger); }
-    .container { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .container-main { max-width: 1080px; margin: 0 auto; }
-    @media (max-width: 1024px) { .row { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .row-2 { grid-template-columns: 1fr; } }
-  </style>
-  <style>
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .modal-box { width: 100%; max-width: 560px; }
-  </style>
+  <link rel="stylesheet" href="dashboard.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>

@@ -1,5 +1,6 @@
 const base = window.location.origin;
 document.getElementById('backendUrl').textContent = base;
+(() => { const overlay = document.getElementById('modal'); if (overlay) overlay.classList.add('hidden'); })();
 const tabs = document.querySelectorAll('.tab');
 tabs.forEach(t => t.addEventListener('click', () => {
   tabs.forEach(x => x.classList.remove('active'));
