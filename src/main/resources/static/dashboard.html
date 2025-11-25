@@ -109,11 +109,11 @@
       <div class="row">
         <input id="c_fecha" type="datetime-local" />
         <select id="c_estado"><option>PROGRAMADA</option><option>COMPLETADA</option><option>CANCELADA</option></select>
-        <input id="c_pacienteId" type="number" placeholder="Paciente ID" />
+        <select id="c_pacienteSel"></select>
       </div>
       <div class="row-2" style="margin-top:8px">
-        <input id="c_doctorId" type="number" placeholder="Doctor ID" />
-        <input id="c_tratamientoId" type="number" placeholder="Tratamiento ID (opcional)" />
+        <select id="c_doctorSel"></select>
+        <select id="c_tratamientoSel"></select>
       </div>
       <div style="margin-top:8px"><button id="c_create" class="ok">Crear</button></div>
       <table id="c_table"><thead><tr><th>ID</th><th>Fecha</th><th>Estado</th><th>Paciente</th><th>Doctor</th><th>Tratamiento</th><th>Acciones</th></tr></thead><tbody></tbody></table>
@@ -122,9 +122,9 @@
     <section id="historias" class="card hidden">
       <h3>Historias Clínicas</h3>
       <div class="row">
-        <input id="h_pacienteId" type="number" placeholder="Paciente ID" />
-        <input id="h_medicoId" type="number" placeholder="Doctor ID" />
-        <input id="h_tratamientoId" type="number" placeholder="Tratamiento ID (opcional)" />
+        <select id="h_pacienteSel"></select>
+        <select id="h_medicoSel"></select>
+        <select id="h_tratamientoSel"></select>
       </div>
       <div class="row">
         <input id="h_detalles" placeholder="Detalles" />
@@ -269,10 +269,7 @@
             onEdit: () => {
               const fecha = prompt('Fecha ISO (YYYY-MM-DDTHH:MM)', item.fechaHora)
               const estado = prompt('Estado (PROGRAMADA|COMPLETADA|CANCELADA)', item.estado)
-              const pacienteId = prompt('Paciente ID', item.pacienteId)
-              const doctorId = prompt('Doctor ID', item.doctorId)
-              const tratamientoId = prompt('Tratamiento ID', item.tratamientoId ?? '')
-              api.citas.update(item.id, { id:item.id, fechaHora:fecha, estado, pacienteId:Number(pacienteId), doctorId:Number(doctorId), tratamientoId:tratamientoId?Number(tratamientoId):null }).then(loadCitas)
+              api.citas.update(item.id, { id:item.id, fechaHora:fecha, estado, pacienteId:item.pacienteId, doctorId:item.doctorId, tratamientoId:item.tratamientoId }).then(loadCitas)
             },
             onDelete: () => api.citas.delete(item.id).then(loadCitas)
           }, item.id, item.fechaHora, item.estado, item.pacienteId, item.doctorId, item.tratamientoId))
@@ -285,13 +282,10 @@
         list.forEach(item => {
           tbody.appendChild(row({
             onEdit: () => {
-              const pacienteId = prompt('Paciente ID', item.pacienteId)
-              const medicoId = prompt('Doctor ID', item.medicoId)
-              const tratamientoId = prompt('Tratamiento ID', item.tratamientoId ?? '')
               const detalles = prompt('Detalles', item.detalles ?? '')
               const diagnostico = prompt('Diagnóstico', item.diagnostico ?? '')
               const fecha = prompt('Fecha (YYYY-MM-DD)', item.fecha)
-              api.historias.update(item.id, { id:item.id, pacienteId:Number(pacienteId), medicoId:Number(medicoId), tratamientoId:tratamientoId?Number(tratamientoId):null, detalles, diagnostico, fecha }).then(loadHistorias)
+              api.historias.update(item.id, { id:item.id, pacienteId:item.pacienteId, medicoId:item.medicoId, tratamientoId:item.tratamientoId, detalles, diagnostico, fecha }).then(loadHistorias)
             },
             onDelete: () => api.historias.delete(item.id).then(loadHistorias)
           }, item.id, item.pacienteId, item.medicoId, item.tratamientoId ?? '', item.diagnostico ?? '', item.fecha))
@@ -312,6 +306,20 @@
       fetch(base + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password}) })
         .then(r => r.ok ? r.json() : Promise.reject(r))
         .then(data => { token = data.token; const prefix = (token||'').slice(0,12); document.getElementById('auth_status').textContent = 'OK ' + prefix + '...'; })
+        .then(() => Promise.all([api.pacientes.list(), api.doctores.list(), api.tratamientos.list()]))
+        .then(([pacientes, doctores, tratamientos]) => {
+          const fill = (id, items, labelFn, empty=false) => {
+            const sel = document.getElementById(id); sel.innerHTML='';
+            if (empty) { const o = document.createElement('option'); o.value=''; o.textContent='— ninguno —'; sel.appendChild(o) }
+            items.forEach(it => { const o = document.createElement('option'); o.value=it.id; o.textContent=labelFn(it); sel.appendChild(o) })
+          }
+          fill('c_pacienteSel', pacientes, p => `${p.nombre} (${p.email})`)
+          fill('c_doctorSel', doctores, d => `${d.nombre} · ${d.especialidad}`)
+          fill('c_tratamientoSel', tratamientos, t => `${t.descripcion}`, true)
+          fill('h_pacienteSel', pacientes, p => `${p.nombre} (${p.email})`)
+          fill('h_medicoSel', doctores, d => `${d.nombre} · ${d.especialidad}`)
+          fill('h_tratamientoSel', tratamientos, t => `${t.descripcion}`, true)
+        })
         .then(() => { loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias(); })
         .catch(() => { document.getElementById('auth_status').textContent = 'ERROR' })
     })
@@ -324,27 +332,27 @@
     document.getElementById('d_create').addEventListener('click', () => {
       const nombre = document.getElementById('d_nombre').value
       const especialidad = document.getElementById('d_especialidad').value
-      api.doctores.create({ nombre, especialidad }).then(loadDoctores)
+      api.doctores.create({ nombre, especialidad }).then(() => { loadDoctores(); })
     })
     document.getElementById('t_create').addEventListener('click', () => {
       const descripcion = document.getElementById('t_descripcion').value
       const costo = document.getElementById('t_costo').value
-      api.tratamientos.create({ descripcion, costo:Number(costo) }).then(loadTratamientos)
+      api.tratamientos.create({ descripcion, costo:Number(costo) }).then(() => { loadTratamientos(); })
     })
     document.getElementById('c_create').addEventListener('click', () => {
       const fechaRaw = document.getElementById('c_fecha').value
       const estado = document.getElementById('c_estado').value
-      const pacienteId = Number(document.getElementById('c_pacienteId').value)
-      const doctorId = Number(document.getElementById('c_doctorId').value)
-      const tratamientoVal = document.getElementById('c_tratamientoId').value
+      const pacienteId = Number(document.getElementById('c_pacienteSel').value)
+      const doctorId = Number(document.getElementById('c_doctorSel').value)
+      const tratamientoVal = document.getElementById('c_tratamientoSel').value
       const tratamientoId = tratamientoVal ? Number(tratamientoVal) : null
       const fechaHora = fechaRaw
       api.citas.create({ fechaHora, estado, pacienteId, doctorId, tratamientoId }).then(loadCitas)
     })
     document.getElementById('h_create').addEventListener('click', () => {
-      const pacienteId = Number(document.getElementById('h_pacienteId').value)
-      const medicoId = Number(document.getElementById('h_medicoId').value)
-      const tratamientoVal = document.getElementById('h_tratamientoId').value
+      const pacienteId = Number(document.getElementById('h_pacienteSel').value)
+      const medicoId = Number(document.getElementById('h_medicoSel').value)
+      const tratamientoVal = document.getElementById('h_tratamientoSel').value
       const tratamientoId = tratamientoVal ? Number(tratamientoVal) : null
       const detalles = document.getElementById('h_detalles').value
       const diagnostico = document.getElementById('h_diagnostico').value
