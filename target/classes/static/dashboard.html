@@ -24,6 +24,10 @@
     .actions { display: flex; gap: 8px; }
     .ok { background: var(--accent); border-color: var(--accent); }
     .ko { background: var(--danger); border-color: var(--danger); }
+    .container { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .container-main { max-width: 1080px; margin: 0 auto; }
+    @media (max-width: 1024px) { .row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .row-2 { grid-template-columns: 1fr; } }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -308,6 +312,7 @@
       fetch(base + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password}) })
         .then(r => r.ok ? r.json() : Promise.reject(r))
         .then(data => { token = data.token; const prefix = (token||'').slice(0,12); document.getElementById('auth_status').textContent = 'OK ' + prefix + '...'; })
+        .then(() => { loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias(); })
         .catch(() => { document.getElementById('auth_status').textContent = 'ERROR' })
     })
     document.getElementById('p_create').addEventListener('click', () => {
@@ -347,7 +352,7 @@
       api.historias.create({ pacienteId, medicoId, tratamientoId, detalles, diagnostico, fecha }).then(loadHistorias)
     })
 
-    loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias()
+    
   </script>
 </body>
 </html>
