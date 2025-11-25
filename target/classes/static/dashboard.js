@@ -54,12 +54,15 @@ function row(actions, ...cells) {
   const tr = document.createElement('tr');
   cells.forEach(c => { const td = document.createElement('td'); td.textContent = c ?? ''; tr.appendChild(td); });
   const tdAct = document.createElement('td');
-  const edit = document.createElement('button'); edit.textContent = 'Editar';
-  const del = document.createElement('button'); del.textContent = 'Eliminar'; del.className = 'ko';
-  edit.addEventListener('click', actions.onEdit);
-  del.addEventListener('click', actions.onDelete);
-  const wrap = document.createElement('div'); wrap.className = 'actions'; wrap.appendChild(edit); wrap.appendChild(del);
-  tdAct.appendChild(wrap); tr.appendChild(tdAct);
+  if (actions) {
+    const edit = document.createElement('button'); edit.textContent = 'Editar';
+    const del = document.createElement('button'); del.textContent = 'Eliminar'; del.className = 'ko';
+    edit.addEventListener('click', actions.onEdit);
+    del.addEventListener('click', actions.onDelete);
+    const wrap = document.createElement('div'); wrap.className = 'actions'; wrap.appendChild(edit); wrap.appendChild(del);
+    tdAct.appendChild(wrap);
+  }
+  tr.appendChild(tdAct);
   return tr;
 }
 
@@ -67,15 +70,18 @@ function loadUsuarios() {
   api.usuarios.list().then(list => {
     const tbody = document.querySelector('#u_table tbody'); tbody.innerHTML = '';
     list.forEach(item => {
-      tbody.appendChild(row({
-        onEdit: () => {
-          const nombre = prompt('Nombre', item.nombre);
-          const email = prompt('Email', item.email);
-          const rol = item.rol;
-          api.usuarios.update(item.id, { id:item.id, nombre, email, rol }).then(loadUsuarios);
+      tbody.appendChild(row(
+        item.rol === 'ADMIN' ? null : {
+          onEdit: () => {
+            const nombre = prompt('Nombre', item.nombre);
+            const email = prompt('Email', item.email);
+            const rol = item.rol;
+            api.usuarios.update(item.id, { id:item.id, nombre, email, rol }).then(loadUsuarios);
+          },
+          onDelete: () => api.usuarios.delete(item.id).then(loadUsuarios)
         },
-        onDelete: () => api.usuarios.delete(item.id).then(loadUsuarios)
-      }, item.id, item.nombre, item.email, item.rol));
+        item.id, item.nombre, item.email, item.rol
+      ));
     });
   });
 }
