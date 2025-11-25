@@ -6,6 +6,7 @@ tabs.forEach(t => t.addEventListener('click', () => {
   t.classList.add('active');
   document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
   document.getElementById(t.dataset.tab).classList.remove('hidden');
+  hideModal();
 }));
 
 let token = null;
@@ -146,12 +147,23 @@ function loadHistorias() {
   });
 }
 
+function hideModal() {
+  const overlay = document.getElementById('modal');
+  if (!overlay.classList.contains('hidden')) {
+    overlay.classList.add('hidden');
+  }
+}
 function openModal(title, builder, onSave) {
   const overlay = document.getElementById('modal'); const mTitle = document.getElementById('modal_title'); const mContent = document.getElementById('modal_content'); mTitle.textContent = title; mContent.innerHTML = ''; builder(mContent); overlay.classList.remove('hidden');
   const saveBtn = document.getElementById('modal_save'); const cancelBtn = document.getElementById('modal_cancel');
-  const close = () => { overlay.classList.add('hidden'); saveBtn.removeEventListener('click', saveHandler); cancelBtn.removeEventListener('click', close); };
+  const close = () => { overlay.classList.add('hidden'); saveBtn.removeEventListener('click', saveHandler); cancelBtn.removeEventListener('click', close); overlay.removeEventListener('click', outsideHandler); document.removeEventListener('keydown', escHandler); };
   const saveHandler = () => { onSave(); close(); };
-  saveBtn.addEventListener('click', saveHandler); cancelBtn.addEventListener('click', close);
+  const outsideHandler = (ev) => { if (ev.target === overlay) close(); };
+  const escHandler = (ev) => { if (ev.key === 'Escape') close(); };
+  saveBtn.addEventListener('click', saveHandler);
+  cancelBtn.addEventListener('click', close);
+  overlay.addEventListener('click', outsideHandler);
+  document.addEventListener('keydown', escHandler);
 }
 
 function editCita(item) {
@@ -231,7 +243,7 @@ document.getElementById('auth_login').addEventListener('click', () => {
       fill('h_medicoSel', doctores, d => `${d.nombre} · ${d.especialidad}`);
       fill('h_tratamientoSel', tratamientos, t => `${t.descripcion}`, true);
     })
-    .then(() => { loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias(); })
+    .then(() => { hideModal(); loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias(); })
     .catch(() => { document.getElementById('auth_status').textContent = 'ERROR'; });
 });
 document.getElementById('p_create').addEventListener('click', () => {
@@ -270,4 +282,3 @@ document.getElementById('h_create').addEventListener('click', () => {
   const fecha = document.getElementById('h_fecha').value;
   api.historias.create({ pacienteId, medicoId, tratamientoId, detalles, diagnostico, fecha }).then(loadHistorias);
 });
-
