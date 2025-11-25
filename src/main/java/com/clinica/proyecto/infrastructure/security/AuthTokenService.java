@@ -3,6 +3,8 @@ package com.clinica.proyecto.infrastructure.security;
 import com.clinica.proyecto.infrastructure.modelo.Usuario;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
@@ -15,7 +17,13 @@ import org.springframework.stereotype.Service;
 public class AuthTokenService {
     private final SecretKey key;
     public AuthTokenService(@Value("${JWT_SECRET:change-me}") String secret) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        byte[] raw = secret.getBytes(StandardCharsets.UTF_8);
+        if (raw.length < 32) {
+            try {
+                raw = MessageDigest.getInstance("SHA-256").digest(raw);
+            } catch (NoSuchAlgorithmException ignored) { }
+        }
+        this.key = Keys.hmacShaKeyFor(raw);
     }
     public String generate(Usuario u) {
         Instant now = Instant.now();

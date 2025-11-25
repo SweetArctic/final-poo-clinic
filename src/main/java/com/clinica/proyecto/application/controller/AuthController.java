@@ -30,7 +30,17 @@ public class AuthController {
         var usuarioOpt = usuarioRepository.findByEmail(email);
         if (usuarioOpt.isEmpty()) return ResponseEntity.status(401).build();
         Usuario u = usuarioOpt.get();
-        if (!passwordEncoder.matches(password, u.getPassword())) return ResponseEntity.status(401).build();
+        boolean ok = passwordEncoder.matches(password, u.getPassword());
+        if (!ok) {
+            String p = u.getPassword();
+            boolean looksHashed = p != null && (p.startsWith("$2a$") || p.startsWith("$2b$") || p.startsWith("$2y$"));
+            if (!looksHashed && password.equals(p)) {
+                u.setPassword(passwordEncoder.encode(password));
+                usuarioRepository.save(u);
+                ok = true;
+            }
+        }
+        if (!ok) return ResponseEntity.status(401).build();
         String token = tokenService.generate(u);
         UsuarioDTO dto = UsuarioMapper.toDTO(u);
         return ResponseEntity.ok(Map.of("token", token, "usuario", dto));
