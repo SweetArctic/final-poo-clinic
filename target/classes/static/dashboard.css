@@ -236,43 +236,6 @@ button:active {
   margin: 0 auto;
 }
 
-@media (max-width: 1024px) {
-  .row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  header {
-    padding: 24px 16px;
-  }
-  
-  main {
-    padding: 24px 16px;
-  }
-  
-  .card {
-    padding: 20px;
-  }
-  
-  .row {
-    grid-template-columns: 1fr;
-  }
-  
-  .row-2 {
-    grid-template-columns: 1fr;
-  }
-  
-  .tabs {
-    gap: 6px;
-  }
-  
-  .tab {
-    font-size: 13px;
-    padding: 8px 12px;
-  }
-}
-
 .modal {
   position: fixed;
   inset: 0;
@@ -299,4 +262,140 @@ button:active {
   font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
   font-size: 13px;
   color: var(--text);
+}
+
+@media (max-width: 1120px) {
+  .container,
+  .container-main {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 24px 16px;
+  }
+  
+  header h1 {
+    font-size: 20px;
+  }
+  
+  main {
+    padding: 24px 16px;
+  }
+  
+  .card {
+    padding: 20px 16px;
+  }
+  
+  .row-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    font-size: 13px;
+  }
+  
+  th,
+  td {
+    padding: 10px 6px;
+  }
+  
+  th {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+  
+  header {
+    padding: 20px 12px;
+  }
+  
+  header h1 {
+    font-size: 18px;
+  }
+  
+  main {
+    padding: 20px 12px;
+  }
+  
+  .card {
+    padding: 16px 12px;
+  }
+  
+  .card h3 {
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+  
+  .row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .row-2 {
+    gap: 10px;
+  }
+  
+  .tabs {
+    gap: 6px;
+  }
+  
+  .tab {
+    font-size: 13px;
+    padding: 8px 12px;
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+  }
+  
+  input,
+  select,
+  button {
+    font-size: 14px;
+    padding: 9px 12px;
+  }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .actions {
+    flex-wrap: wrap;
+  }
+  
+  .actions button {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .modal {
+    padding: 12px;
+  }
+  
+  .modal-box {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .tab {
+    width: 100%;
+  }
 }
