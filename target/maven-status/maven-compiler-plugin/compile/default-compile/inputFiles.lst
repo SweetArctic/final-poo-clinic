@@ -1,3 +1,4 @@
+C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\application\controller\AuthController.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\application\controller\CitaController.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\application\controller\DashboardController.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\application\controller\DoctorController.java
@@ -18,6 +19,7 @@ C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proye
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\application\mapper\PacienteMapper.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\application\mapper\TratamientoMapper.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\application\mapper\UsuarioMapper.java
+C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\config\SecurityConfig.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\modelo\Cita.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\modelo\Doctor.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\modelo\enums\EstadoCita.java
@@ -32,4 +34,6 @@ C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proye
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\repository\PacienteRepository.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\repository\TratamientoRepository.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\repository\UsuarioRepository.java
+C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\security\AuthTokenService.java
+C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\infrastructure\security\TokenFilter.java
 C:\Users\Excha\Documents\GitHub\final-poo-clinic\src\main\java\com\clinica\proyecto\ProyectoClinicaApplication.java

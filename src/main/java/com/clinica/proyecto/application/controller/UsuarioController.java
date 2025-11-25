@@ -16,8 +16,10 @@ import java.util.stream.Collectors;
 @Validated
 public class UsuarioController {
     private final UsuarioRepository repository;
-    public UsuarioController(UsuarioRepository repository) {
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    public UsuarioController(UsuarioRepository repository, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
     @GetMapping
     public List<UsuarioDTO> listar() {
@@ -30,6 +32,7 @@ public class UsuarioController {
     @PostMapping
     public UsuarioDTO crear(@RequestBody UsuarioCreateDTO dto) {
         Usuario e = UsuarioMapper.toEntity(dto);
+        e.setPassword(passwordEncoder.encode(e.getPassword()));
         return UsuarioMapper.toDTO(repository.save(e));
     }
     @PutMapping("/{id}")
