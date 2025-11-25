@@ -1,6 +1,6 @@
 const base = window.location.origin;
 document.getElementById('backendUrl').textContent = base;
-(() => { const overlay = document.getElementById('modal'); if (overlay) overlay.classList.add('hidden'); })();
+(() => { const overlay = document.getElementById('modal'); if (overlay) { overlay.classList.add('hidden'); overlay.style.display = 'none'; } })();
 const tabs = document.querySelectorAll('.tab');
 tabs.forEach(t => t.addEventListener('click', () => {
   tabs.forEach(x => x.classList.remove('active'));
@@ -153,9 +153,10 @@ function hideModal() {
   if (!overlay.classList.contains('hidden')) {
     overlay.classList.add('hidden');
   }
+  overlay.style.display = 'none';
 }
 function openModal(title, builder, onSave) {
-  const overlay = document.getElementById('modal'); const mTitle = document.getElementById('modal_title'); const mContent = document.getElementById('modal_content'); mTitle.textContent = title; mContent.innerHTML = ''; builder(mContent); overlay.classList.remove('hidden');
+  const overlay = document.getElementById('modal'); const mTitle = document.getElementById('modal_title'); const mContent = document.getElementById('modal_content'); mTitle.textContent = title; mContent.innerHTML = ''; builder(mContent); overlay.classList.remove('hidden'); overlay.style.display = 'flex';
   const saveBtn = document.getElementById('modal_save'); const cancelBtn = document.getElementById('modal_cancel');
   const close = () => { overlay.classList.add('hidden'); saveBtn.removeEventListener('click', saveHandler); cancelBtn.removeEventListener('click', close); overlay.removeEventListener('click', outsideHandler); document.removeEventListener('keydown', escHandler); };
   const saveHandler = () => { onSave(); close(); };
