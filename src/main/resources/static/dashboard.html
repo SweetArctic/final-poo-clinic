@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clínica - Dashboard</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    header { padding: 24px; background: #1e293b; }
+    main { padding: 24px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    a { color: #93c5fd; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .endpoint { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dashboard Clínica</h1>
+    <p>URL pública: <span id="publicUrl"></span></p>
+  </header>
+  <main>
+    <div class="grid">
+      <div class="card">
+        <h3>Endpoints</h3>
+        <ul>
+          <li class="endpoint"><a href="/api/usuarios" target="_blank">GET /api/usuarios</a></li>
+          <li class="endpoint"><a href="/api/pacientes" target="_blank">GET /api/pacientes</a></li>
+          <li class="endpoint"><a href="/api/doctores" target="_blank">GET /api/doctores</a></li>
+          <li class="endpoint"><a href="/api/citas" target="_blank">GET /api/citas</a></li>
+          <li class="endpoint"><a href="/api/tratamientos" target="_blank">GET /api/tratamientos</a></li>
+          <li class="endpoint"><a href="/api/historias" target="_blank">GET /api/historias</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Estado</h3>
+        <p>Si la app está desplegada en Railway, esta página responde en la URL pública.</p>
+        <p>Backend en: <span id="backendUrl"></span></p>
+      </div>
+    </div>
+  </main>
+  <script>
+    const backendUrl = window.location.origin;
+    document.getElementById('backendUrl').textContent = backendUrl;
+    document.getElementById('publicUrl').textContent = backendUrl;
+  </script>
+</body>
+</html>
