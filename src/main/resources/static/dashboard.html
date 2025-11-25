@@ -5,44 +5,329 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Clínica - Dashboard</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
-    header { padding: 24px; background: #1e293b; }
+    :root { --bg:#0f172a; --panel:#111827; --panel2:#1e293b; --border:#334155; --text:#e2e8f0; --link:#93c5fd; --accent:#22c55e; --danger:#ef4444; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+    header { padding: 24px; background: var(--panel2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
     main { padding: 24px; }
-    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-    a { color: #93c5fd; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-    .endpoint { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    a { color: var(--link); text-decoration: none; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .tab { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--panel); }
+    .tab.active { background: var(--panel2); }
+    .hidden { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; }
+    input, select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); color: var(--text); }
+    button { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel2); color: var(--text); cursor: pointer; }
+    .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .actions { display: flex; gap: 8px; }
+    .ok { background: var(--accent); border-color: var(--accent); }
+    .ko { background: var(--danger); border-color: var(--danger); }
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
   <header>
-    <h1>Dashboard Clínica</h1>
-    <p>URL pública: <span id="publicUrl"></span></p>
+    <div>
+      <h1>Dashboard Clínica</h1>
+      <div>Backend: <span id="backendUrl"></span></div>
+    </div>
+    <nav class="tabs">
+      <div class="tab active" data-tab="usuarios">Usuarios</div>
+      <div class="tab" data-tab="pacientes">Pacientes</div>
+      <div class="tab" data-tab="doctores">Doctores</div>
+      <div class="tab" data-tab="citas">Citas</div>
+      <div class="tab" data-tab="tratamientos">Tratamientos</div>
+      <div class="tab" data-tab="historias">Historias</div>
+    </nav>
   </header>
   <main>
-    <div class="grid">
-      <div class="card">
-        <h3>Endpoints</h3>
-        <ul>
-          <li class="endpoint"><a href="/api/usuarios" target="_blank">GET /api/usuarios</a></li>
-          <li class="endpoint"><a href="/api/pacientes" target="_blank">GET /api/pacientes</a></li>
-          <li class="endpoint"><a href="/api/doctores" target="_blank">GET /api/doctores</a></li>
-          <li class="endpoint"><a href="/api/citas" target="_blank">GET /api/citas</a></li>
-          <li class="endpoint"><a href="/api/tratamientos" target="_blank">GET /api/tratamientos</a></li>
-          <li class="endpoint"><a href="/api/historias" target="_blank">GET /api/historias</a></li>
-        </ul>
+    <section id="usuarios" class="card">
+      <h3>Usuarios</h3>
+      <div class="row">
+        <input id="u_nombre" placeholder="Nombre" />
+        <input id="u_email" placeholder="Email" />
+        <select id="u_rol"><option>ADMIN</option><option>DOCTOR</option><option>PACIENTE</option></select>
       </div>
-      <div class="card">
-        <h3>Estado</h3>
-        <p>Si la app está desplegada en Railway, esta página responde en la URL pública.</p>
-        <p>Backend en: <span id="backendUrl"></span></p>
+      <div class="row-2" style="margin-top:8px">
+        <input id="u_password" placeholder="Password" type="password" />
+        <button id="u_create" class="ok">Crear</button>
       </div>
-    </div>
+      <table id="u_table"><thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section id="pacientes" class="card hidden">
+      <h3>Pacientes</h3>
+      <div class="row">
+        <input id="p_nombre" placeholder="Nombre" />
+        <input id="p_email" placeholder="Email" />
+        <input id="p_telefono" placeholder="Teléfono" />
+      </div>
+      <div style="margin-top:8px"><button id="p_create" class="ok">Crear</button></div>
+      <table id="p_table"><thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section id="doctores" class="card hidden">
+      <h3>Doctores</h3>
+      <div class="row">
+        <input id="d_nombre" placeholder="Nombre" />
+        <input id="d_especialidad" placeholder="Especialidad" />
+      </div>
+      <div style="margin-top:8px"><button id="d_create" class="ok">Crear</button></div>
+      <table id="d_table"><thead><tr><th>ID</th><th>Nombre</th><th>Especialidad</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section id="tratamientos" class="card hidden">
+      <h3>Tratamientos</h3>
+      <div class="row">
+        <input id="t_descripcion" placeholder="Descripción" />
+        <input id="t_costo" type="number" step="0.01" placeholder="Costo" />
+      </div>
+      <div style="margin-top:8px"><button id="t_create" class="ok">Crear</button></div>
+      <table id="t_table"><thead><tr><th>ID</th><th>Descripción</th><th>Costo</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section id="citas" class="card hidden">
+      <h3>Citas</h3>
+      <div class="row">
+        <input id="c_fecha" type="datetime-local" />
+        <select id="c_estado"><option>PROGRAMADA</option><option>COMPLETADA</option><option>CANCELADA</option></select>
+        <input id="c_pacienteId" type="number" placeholder="Paciente ID" />
+      </div>
+      <div class="row-2" style="margin-top:8px">
+        <input id="c_doctorId" type="number" placeholder="Doctor ID" />
+        <input id="c_tratamientoId" type="number" placeholder="Tratamiento ID (opcional)" />
+      </div>
+      <div style="margin-top:8px"><button id="c_create" class="ok">Crear</button></div>
+      <table id="c_table"><thead><tr><th>ID</th><th>Fecha</th><th>Estado</th><th>Paciente</th><th>Doctor</th><th>Tratamiento</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section id="historias" class="card hidden">
+      <h3>Historias Clínicas</h3>
+      <div class="row">
+        <input id="h_pacienteId" type="number" placeholder="Paciente ID" />
+        <input id="h_medicoId" type="number" placeholder="Doctor ID" />
+        <input id="h_tratamientoId" type="number" placeholder="Tratamiento ID (opcional)" />
+      </div>
+      <div class="row">
+        <input id="h_detalles" placeholder="Detalles" />
+        <input id="h_diagnostico" placeholder="Diagnóstico" />
+        <input id="h_fecha" type="date" />
+      </div>
+      <div style="margin-top:8px"><button id="h_create" class="ok">Crear</button></div>
+      <table id="h_table"><thead><tr><th>ID</th><th>Paciente</th><th>Médico</th><th>Tratamiento</th><th>Diagnóstico</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    </section>
   </main>
   <script>
-    const backendUrl = window.location.origin;
-    document.getElementById('backendUrl').textContent = backendUrl;
-    document.getElementById('publicUrl').textContent = backendUrl;
+    const base = window.location.origin
+    document.getElementById('backendUrl').textContent = base
+    const tabs = document.querySelectorAll('.tab')
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'))
+      t.classList.add('active')
+      document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'))
+      document.getElementById(t.dataset.tab).classList.remove('hidden')
+    }))
+
+    const api = {
+      usuarios: {
+        list: () => fetch(base + '/api/usuarios').then(r => r.json()),
+        create: (payload) => fetch(base + '/api/usuarios', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        update: (id, payload) => fetch(base + '/api/usuarios/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        delete: (id) => fetch(base + '/api/usuarios/' + id, {method:'DELETE'})
+      },
+      pacientes: {
+        list: () => fetch(base + '/api/pacientes').then(r => r.json()),
+        create: (payload) => fetch(base + '/api/pacientes', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        update: (id, payload) => fetch(base + '/api/pacientes/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        delete: (id) => fetch(base + '/api/pacientes/' + id, {method:'DELETE'})
+      },
+      doctores: {
+        list: () => fetch(base + '/api/doctores').then(r => r.json()),
+        create: (payload) => fetch(base + '/api/doctores', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        update: (id, payload) => fetch(base + '/api/doctores/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        delete: (id) => fetch(base + '/api/doctores/' + id, {method:'DELETE'})
+      },
+      tratamientos: {
+        list: () => fetch(base + '/api/tratamientos').then(r => r.json()),
+        create: (payload) => fetch(base + '/api/tratamientos', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        update: (id, payload) => fetch(base + '/api/tratamientos/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        delete: (id) => fetch(base + '/api/tratamientos/' + id, {method:'DELETE'})
+      },
+      citas: {
+        list: () => fetch(base + '/api/citas').then(r => r.json()),
+        create: (payload) => fetch(base + '/api/citas', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        update: (id, payload) => fetch(base + '/api/citas/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        delete: (id) => fetch(base + '/api/citas/' + id, {method:'DELETE'})
+      },
+      historias: {
+        list: () => fetch(base + '/api/historias').then(r => r.json()),
+        create: (payload) => fetch(base + '/api/historias', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        update: (id, payload) => fetch(base + '/api/historias/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()),
+        delete: (id) => fetch(base + '/api/historias/' + id, {method:'DELETE'})
+      }
+    }
+
+    function row(actions, ...cells) {
+      const tr = document.createElement('tr')
+      cells.forEach(c => { const td = document.createElement('td'); td.textContent = c ?? ''; tr.appendChild(td) })
+      const tdAct = document.createElement('td')
+      const edit = document.createElement('button'); edit.textContent = 'Editar'
+      const del = document.createElement('button'); del.textContent = 'Eliminar'; del.className = 'ko'
+      edit.addEventListener('click', actions.onEdit)
+      del.addEventListener('click', actions.onDelete)
+      const wrap = document.createElement('div'); wrap.className = 'actions'; wrap.appendChild(edit); wrap.appendChild(del)
+      tdAct.appendChild(wrap); tr.appendChild(tdAct)
+      return tr
+    }
+
+    function loadUsuarios() {
+      api.usuarios.list().then(list => {
+        const tbody = document.querySelector('#u_table tbody'); tbody.innerHTML = ''
+        list.forEach(item => {
+          tbody.appendChild(row({
+            onEdit: () => {
+              const nombre = prompt('Nombre', item.nombre)
+              const email = prompt('Email', item.email)
+              const rol = prompt('Rol (ADMIN|DOCTOR|PACIENTE)', item.rol)
+              api.usuarios.update(item.id, { id:item.id, nombre, email, rol }).then(loadUsuarios)
+            },
+            onDelete: () => api.usuarios.delete(item.id).then(loadUsuarios)
+          }, item.id, item.nombre, item.email, item.rol))
+        })
+      })
+    }
+    function loadPacientes() {
+      api.pacientes.list().then(list => {
+        const tbody = document.querySelector('#p_table tbody'); tbody.innerHTML = ''
+        list.forEach(item => {
+          tbody.appendChild(row({
+            onEdit: () => {
+              const nombre = prompt('Nombre', item.nombre)
+              const email = prompt('Email', item.email)
+              const telefono = prompt('Teléfono', item.telefono)
+              api.pacientes.update(item.id, { id:item.id, nombre, email, telefono }).then(loadPacientes)
+            },
+            onDelete: () => api.pacientes.delete(item.id).then(loadPacientes)
+          }, item.id, item.nombre, item.email, item.telefono))
+        })
+      })
+    }
+    function loadDoctores() {
+      api.doctores.list().then(list => {
+        const tbody = document.querySelector('#d_table tbody'); tbody.innerHTML = ''
+        list.forEach(item => {
+          tbody.appendChild(row({
+            onEdit: () => {
+              const nombre = prompt('Nombre', item.nombre)
+              const especialidad = prompt('Especialidad', item.especialidad)
+              api.doctores.update(item.id, { id:item.id, nombre, especialidad }).then(loadDoctores)
+            },
+            onDelete: () => api.doctores.delete(item.id).then(loadDoctores)
+          }, item.id, item.nombre, item.especialidad))
+        })
+      })
+    }
+    function loadTratamientos() {
+      api.tratamientos.list().then(list => {
+        const tbody = document.querySelector('#t_table tbody'); tbody.innerHTML = ''
+        list.forEach(item => {
+          tbody.appendChild(row({
+            onEdit: () => {
+              const descripcion = prompt('Descripción', item.descripcion)
+              const costo = prompt('Costo', item.costo)
+              api.tratamientos.update(item.id, { id:item.id, descripcion, costo }).then(loadTratamientos)
+            },
+            onDelete: () => api.tratamientos.delete(item.id).then(loadTratamientos)
+          }, item.id, item.descripcion, item.costo))
+        })
+      })
+    }
+    function loadCitas() {
+      api.citas.list().then(list => {
+        const tbody = document.querySelector('#c_table tbody'); tbody.innerHTML = ''
+        list.forEach(item => {
+          tbody.appendChild(row({
+            onEdit: () => {
+              const fecha = prompt('Fecha ISO (YYYY-MM-DDTHH:MM)', item.fechaHora)
+              const estado = prompt('Estado (PROGRAMADA|COMPLETADA|CANCELADA)', item.estado)
+              const pacienteId = prompt('Paciente ID', item.pacienteId)
+              const doctorId = prompt('Doctor ID', item.doctorId)
+              const tratamientoId = prompt('Tratamiento ID', item.tratamientoId ?? '')
+              api.citas.update(item.id, { id:item.id, fechaHora:fecha, estado, pacienteId:Number(pacienteId), doctorId:Number(doctorId), tratamientoId:tratamientoId?Number(tratamientoId):null }).then(loadCitas)
+            },
+            onDelete: () => api.citas.delete(item.id).then(loadCitas)
+          }, item.id, item.fechaHora, item.estado, item.pacienteId, item.doctorId, item.tratamientoId))
+        })
+      })
+    }
+    function loadHistorias() {
+      api.historias.list().then(list => {
+        const tbody = document.querySelector('#h_table tbody'); tbody.innerHTML = ''
+        list.forEach(item => {
+          tbody.appendChild(row({
+            onEdit: () => {
+              const pacienteId = prompt('Paciente ID', item.pacienteId)
+              const medicoId = prompt('Doctor ID', item.medicoId)
+              const tratamientoId = prompt('Tratamiento ID', item.tratamientoId ?? '')
+              const detalles = prompt('Detalles', item.detalles ?? '')
+              const diagnostico = prompt('Diagnóstico', item.diagnostico ?? '')
+              const fecha = prompt('Fecha (YYYY-MM-DD)', item.fecha)
+              api.historias.update(item.id, { id:item.id, pacienteId:Number(pacienteId), medicoId:Number(medicoId), tratamientoId:tratamientoId?Number(tratamientoId):null, detalles, diagnostico, fecha }).then(loadHistorias)
+            },
+            onDelete: () => api.historias.delete(item.id).then(loadHistorias)
+          }, item.id, item.pacienteId, item.medicoId, item.tratamientoId ?? '', item.diagnostico ?? '', item.fecha))
+        })
+      })
+    }
+
+    document.getElementById('u_create').addEventListener('click', () => {
+      const nombre = document.getElementById('u_nombre').value
+      const email = document.getElementById('u_email').value
+      const password = document.getElementById('u_password').value
+      const rol = document.getElementById('u_rol').value
+      api.usuarios.create({ nombre, email, password, rol }).then(loadUsuarios)
+    })
+    document.getElementById('p_create').addEventListener('click', () => {
+      const nombre = document.getElementById('p_nombre').value
+      const email = document.getElementById('p_email').value
+      const telefono = document.getElementById('p_telefono').value
+      api.pacientes.create({ nombre, email, telefono }).then(loadPacientes)
+    })
+    document.getElementById('d_create').addEventListener('click', () => {
+      const nombre = document.getElementById('d_nombre').value
+      const especialidad = document.getElementById('d_especialidad').value
+      api.doctores.create({ nombre, especialidad }).then(loadDoctores)
+    })
+    document.getElementById('t_create').addEventListener('click', () => {
+      const descripcion = document.getElementById('t_descripcion').value
+      const costo = document.getElementById('t_costo').value
+      api.tratamientos.create({ descripcion, costo:Number(costo) }).then(loadTratamientos)
+    })
+    document.getElementById('c_create').addEventListener('click', () => {
+      const fechaRaw = document.getElementById('c_fecha').value
+      const estado = document.getElementById('c_estado').value
+      const pacienteId = Number(document.getElementById('c_pacienteId').value)
+      const doctorId = Number(document.getElementById('c_doctorId').value)
+      const tratamientoVal = document.getElementById('c_tratamientoId').value
+      const tratamientoId = tratamientoVal ? Number(tratamientoVal) : null
+      const fechaHora = fechaRaw
+      api.citas.create({ fechaHora, estado, pacienteId, doctorId, tratamientoId }).then(loadCitas)
+    })
+    document.getElementById('h_create').addEventListener('click', () => {
+      const pacienteId = Number(document.getElementById('h_pacienteId').value)
+      const medicoId = Number(document.getElementById('h_medicoId').value)
+      const tratamientoVal = document.getElementById('h_tratamientoId').value
+      const tratamientoId = tratamientoVal ? Number(tratamientoVal) : null
+      const detalles = document.getElementById('h_detalles').value
+      const diagnostico = document.getElementById('h_diagnostico').value
+      const fecha = document.getElementById('h_fecha').value
+      api.historias.create({ pacienteId, medicoId, tratamientoId, detalles, diagnostico, fecha }).then(loadHistorias)
+    })
+
+    loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias()
   </script>
 </body>
 </html>

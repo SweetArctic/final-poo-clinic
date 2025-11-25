@@ -32,6 +32,11 @@ public class PacienteController {
         entidad.setId(null);
         return PacienteMapper.toDTO(repository.save(entidad));
     }
+    @PostMapping("/batch")
+    public List<PacienteDTO> crearBatch(@RequestBody List<PacienteDTO> dtos) {
+        List<Paciente> entidades = dtos.stream().map(PacienteMapper::toEntity).peek(p -> p.setId(null)).collect(Collectors.toList());
+        return repository.saveAll(entidades).stream().map(PacienteMapper::toDTO).collect(Collectors.toList());
+    }
     @PutMapping("/{id}")
     public ResponseEntity<PacienteDTO> actualizar(@PathVariable Long id, @RequestBody PacienteDTO dto) {
         if (!repository.existsById(id)) {
