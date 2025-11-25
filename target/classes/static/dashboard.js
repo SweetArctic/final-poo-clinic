@@ -71,7 +71,7 @@ function loadUsuarios() {
         onEdit: () => {
           const nombre = prompt('Nombre', item.nombre);
           const email = prompt('Email', item.email);
-          const rol = prompt('Rol (ADMIN|DOCTOR|PACIENTE)', item.rol);
+          const rol = item.rol;
           api.usuarios.update(item.id, { id:item.id, nombre, email, rol }).then(loadUsuarios);
         },
         onDelete: () => api.usuarios.delete(item.id).then(loadUsuarios)
@@ -222,7 +222,7 @@ document.getElementById('u_create').addEventListener('click', () => {
   const nombre = document.getElementById('u_nombre').value;
   const email = document.getElementById('u_email').value;
   const password = document.getElementById('u_password').value;
-  const rol = document.getElementById('u_rol').value;
+  const rol = 'ADMIN';
   api.usuarios.create({ nombre, email, password, rol }).then(loadUsuarios);
 });
 document.getElementById('auth_login').addEventListener('click', () => {
@@ -245,7 +245,22 @@ document.getElementById('auth_login').addEventListener('click', () => {
       fill('h_medicoSel', doctores, d => `${d.nombre} · ${d.especialidad}`);
       fill('h_tratamientoSel', tratamientos, t => `${t.descripcion}`, true);
     })
-    .then(() => { hideModal(); loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias(); })
+    .then(() => {
+      try {
+        const payload = JSON.parse(atob((token||'').split('.')[1]||''));
+        const rol = payload && payload.rol;
+        if (rol !== 'ADMIN') {
+          const tab = document.querySelector('.tab[data-tab="usuarios"]');
+          const sec = document.getElementById('usuarios');
+          if (tab) tab.style.display = 'none';
+          if (sec) sec.classList.add('hidden');
+          const firstVisibleTab = Array.from(document.querySelectorAll('.tab')).find(t => t.style.display !== 'none');
+          if (firstVisibleTab) firstVisibleTab.click();
+        }
+      } catch(e) {}
+      hideModal();
+      loadUsuarios(); loadPacientes(); loadDoctores(); loadTratamientos(); loadCitas(); loadHistorias();
+    })
     .catch(() => { document.getElementById('auth_status').textContent = 'ERROR'; });
 });
 document.getElementById('p_create').addEventListener('click', () => {
