@@ -145,37 +145,37 @@
     let token = null
     const api = {
       usuarios: {
-        list: () => fetch(base + '/api/usuarios').then(r => r.json()),
+        list: () => fetch(base + '/api/usuarios', { headers:{ ...(token?{Authorization:'Bearer '+token}:{}) } }).then(r => r.json()),
         create: (payload) => fetch(base + '/api/usuarios', {method:'POST', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         update: (id, payload) => fetch(base + '/api/usuarios/' + id, {method:'PUT', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         delete: (id) => fetch(base + '/api/usuarios/' + id, {method:'DELETE', headers:{...(token?{Authorization:'Bearer '+token}:{})}})
       },
       pacientes: {
-        list: () => fetch(base + '/api/pacientes').then(r => r.json()),
+        list: () => fetch(base + '/api/pacientes', { headers:{ ...(token?{Authorization:'Bearer '+token}:{}) } }).then(r => r.json()),
         create: (payload) => fetch(base + '/api/pacientes', {method:'POST', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         update: (id, payload) => fetch(base + '/api/pacientes/' + id, {method:'PUT', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         delete: (id) => fetch(base + '/api/pacientes/' + id, {method:'DELETE', headers:{...(token?{Authorization:'Bearer '+token}:{})}})
       },
       doctores: {
-        list: () => fetch(base + '/api/doctores').then(r => r.json()),
+        list: () => fetch(base + '/api/doctores', { headers:{ ...(token?{Authorization:'Bearer '+token}:{}) } }).then(r => r.json()),
         create: (payload) => fetch(base + '/api/doctores', {method:'POST', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         update: (id, payload) => fetch(base + '/api/doctores/' + id, {method:'PUT', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         delete: (id) => fetch(base + '/api/doctores/' + id, {method:'DELETE', headers:{...(token?{Authorization:'Bearer '+token}:{})}})
       },
       tratamientos: {
-        list: () => fetch(base + '/api/tratamientos').then(r => r.json()),
+        list: () => fetch(base + '/api/tratamientos', { headers:{ ...(token?{Authorization:'Bearer '+token}:{}) } }).then(r => r.json()),
         create: (payload) => fetch(base + '/api/tratamientos', {method:'POST', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         update: (id, payload) => fetch(base + '/api/tratamientos/' + id, {method:'PUT', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         delete: (id) => fetch(base + '/api/tratamientos/' + id, {method:'DELETE', headers:{...(token?{Authorization:'Bearer '+token}:{})}})
       },
       citas: {
-        list: () => fetch(base + '/api/citas').then(r => r.json()),
+        list: () => fetch(base + '/api/citas', { headers:{ ...(token?{Authorization:'Bearer '+token}:{}) } }).then(r => r.json()),
         create: (payload) => fetch(base + '/api/citas', {method:'POST', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         update: (id, payload) => fetch(base + '/api/citas/' + id, {method:'PUT', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         delete: (id) => fetch(base + '/api/citas/' + id, {method:'DELETE', headers:{...(token?{Authorization:'Bearer '+token}:{})}})
       },
       historias: {
-        list: () => fetch(base + '/api/historias').then(r => r.json()),
+        list: () => fetch(base + '/api/historias', { headers:{ ...(token?{Authorization:'Bearer '+token}:{}) } }).then(r => r.json()),
         create: (payload) => fetch(base + '/api/historias', {method:'POST', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         update: (id, payload) => fetch(base + '/api/historias/' + id, {method:'PUT', headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{})}, body:JSON.stringify(payload)}).then(r=>r.json()),
         delete: (id) => fetch(base + '/api/historias/' + id, {method:'DELETE', headers:{...(token?{Authorization:'Bearer '+token}:{})}})
@@ -307,7 +307,7 @@
       const password = document.getElementById('auth_password').value
       fetch(base + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password}) })
         .then(r => r.ok ? r.json() : Promise.reject(r))
-        .then(data => { token = data.token; document.getElementById('auth_status').textContent = 'OK' })
+        .then(data => { token = data.token; const prefix = (token||'').slice(0,12); document.getElementById('auth_status').textContent = 'OK ' + prefix + '...'; })
         .catch(() => { document.getElementById('auth_status').textContent = 'ERROR' })
     })
     document.getElementById('p_create').addEventListener('click', () => {

@@ -25,11 +25,8 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/dashboard", "/dashboard.html", "/static/**", "/actuator/health", "/api/auth/login").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/**").authenticated()
-                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/**").authenticated()
-                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/**").authenticated()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
             )
             .addFilterBefore(new TokenFilter(tokenService), UsernamePasswordAuthenticationFilter.class);
         return http.build();
