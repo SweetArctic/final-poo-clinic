@@ -29,6 +29,10 @@
     @media (max-width: 1024px) { .row { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .row-2 { grid-template-columns: 1fr; } }
   </style>
+  <style>
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .modal-box { width: 100%; max-width: 560px; }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
@@ -135,6 +139,7 @@
       <table id="h_table"><thead><tr><th>ID</th><th>Paciente</th><th>Médico</th><th>Tratamiento</th><th>Diagnóstico</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody></tbody></table>
     </section>
   </main>
+  <div id="modal" class="modal hidden"><div class="modal-box card"><h3 id="modal_title"></h3><div id="modal_content"></div><div class="actions" style="margin-top:8px"><button id="modal_save" class="ok">Guardar</button><button id="modal_cancel" class="ko">Cancelar</button></div></div></div>
   <script>
     const base = window.location.origin
     document.getElementById('backendUrl').textContent = base
@@ -266,11 +271,7 @@
         const tbody = document.querySelector('#c_table tbody'); tbody.innerHTML = ''
         list.forEach(item => {
           tbody.appendChild(row({
-            onEdit: () => {
-              const fecha = prompt('Fecha ISO (YYYY-MM-DDTHH:MM)', item.fechaHora)
-              const estado = prompt('Estado (PROGRAMADA|COMPLETADA|CANCELADA)', item.estado)
-              api.citas.update(item.id, { id:item.id, fechaHora:fecha, estado, pacienteId:item.pacienteId, doctorId:item.doctorId, tratamientoId:item.tratamientoId }).then(loadCitas)
-            },
+            onEdit: () => editCita(item),
             onDelete: () => api.citas.delete(item.id).then(loadCitas)
           }, item.id, item.fechaHora, item.estado, item.pacienteId, item.doctorId, item.tratamientoId))
         })
@@ -281,15 +282,68 @@
         const tbody = document.querySelector('#h_table tbody'); tbody.innerHTML = ''
         list.forEach(item => {
           tbody.appendChild(row({
-            onEdit: () => {
-              const detalles = prompt('Detalles', item.detalles ?? '')
-              const diagnostico = prompt('Diagnóstico', item.diagnostico ?? '')
-              const fecha = prompt('Fecha (YYYY-MM-DD)', item.fecha)
-              api.historias.update(item.id, { id:item.id, pacienteId:item.pacienteId, medicoId:item.medicoId, tratamientoId:item.tratamientoId, detalles, diagnostico, fecha }).then(loadHistorias)
-            },
+            onEdit: () => editHistoria(item),
             onDelete: () => api.historias.delete(item.id).then(loadHistorias)
           }, item.id, item.pacienteId, item.medicoId, item.tratamientoId ?? '', item.diagnostico ?? '', item.fecha))
         })
+      })
+    }
+
+    function openModal(title, builder, onSave) {
+      const overlay = document.getElementById('modal'); const mTitle = document.getElementById('modal_title'); const mContent = document.getElementById('modal_content'); mTitle.textContent = title; mContent.innerHTML = ''; builder(mContent); overlay.classList.remove('hidden');
+      const saveBtn = document.getElementById('modal_save'); const cancelBtn = document.getElementById('modal_cancel');
+      const close = () => { overlay.classList.add('hidden'); saveBtn.removeEventListener('click', saveHandler); cancelBtn.removeEventListener('click', close) }
+      const saveHandler = () => { onSave(); close() }
+      saveBtn.addEventListener('click', saveHandler); cancelBtn.addEventListener('click', close)
+    }
+
+    function editCita(item) {
+      openModal('Editar Cita', (root) => {
+        const rowA = document.createElement('div'); rowA.className='row';
+        const iFecha = document.createElement('input'); iFecha.type='datetime-local'; iFecha.id='e_c_fecha'; iFecha.value=item.fechaHora||''
+        const sEstado = document.createElement('select'); sEstado.id='e_c_estado'; ['PROGRAMADA','COMPLETADA','CANCELADA'].forEach(x=>{ const o=document.createElement('option'); o.textContent=x; if (x===item.estado) o.selected=true; sEstado.appendChild(o) })
+        const sPaciente = document.getElementById('c_pacienteSel').cloneNode(true); sPaciente.id='e_c_pacienteSel'; Array.from(sPaciente.options).forEach(o=>{ if (Number(o.value)===item.pacienteId) o.selected=true })
+        rowA.appendChild(iFecha); rowA.appendChild(sEstado); rowA.appendChild(sPaciente); root.appendChild(rowA);
+        const rowB = document.createElement('div'); rowB.className='row-2';
+        const sDoctor = document.getElementById('c_doctorSel').cloneNode(true); sDoctor.id='e_c_doctorSel'; Array.from(sDoctor.options).forEach(o=>{ if (Number(o.value)===item.doctorId) o.selected=true })
+        const sTrat = document.getElementById('c_tratamientoSel').cloneNode(true); sTrat.id='e_c_tratSel'; Array.from(sTrat.options).forEach(o=>{ if (o.value!=='' && Number(o.value)===item.tratamientoId) o.selected=true })
+        rowB.appendChild(sDoctor); rowB.appendChild(sTrat); root.appendChild(rowB);
+      }, () => {
+        const payload = {
+          id:item.id,
+          fechaHora: document.getElementById('e_c_fecha').value || item.fechaHora,
+          estado: document.getElementById('e_c_estado').value,
+          pacienteId: Number(document.getElementById('e_c_pacienteSel').value || item.pacienteId),
+          doctorId: Number(document.getElementById('e_c_doctorSel').value || item.doctorId),
+          tratamientoId: (()=>{ const v=document.getElementById('e_c_tratSel').value; return v?Number(v):null })()
+        }
+        api.citas.update(item.id, payload).then(loadCitas)
+      })
+    }
+
+    function editHistoria(item) {
+      openModal('Editar Historia', (root) => {
+        const rowA = document.createElement('div'); rowA.className='row';
+        const sPaciente = document.getElementById('h_pacienteSel').cloneNode(true); sPaciente.id='e_h_pacienteSel'; Array.from(sPaciente.options).forEach(o=>{ if (Number(o.value)===item.pacienteId) o.selected=true })
+        const sMedico = document.getElementById('h_medicoSel').cloneNode(true); sMedico.id='e_h_medicoSel'; Array.from(sMedico.options).forEach(o=>{ if (Number(o.value)===item.medicoId) o.selected=true })
+        const sTrat = document.getElementById('h_tratamientoSel').cloneNode(true); sTrat.id='e_h_tratSel'; Array.from(sTrat.options).forEach(o=>{ if (o.value!=='' && Number(o.value)===item.tratamientoId) o.selected=true })
+        rowA.appendChild(sPaciente); rowA.appendChild(sMedico); rowA.appendChild(sTrat); root.appendChild(rowA);
+        const rowB = document.createElement('div'); rowB.className='row';
+        const iDet = document.createElement('input'); iDet.id='e_h_detalles'; iDet.placeholder='Detalles'; iDet.value=item.detalles||''
+        const iDiag = document.createElement('input'); iDiag.id='e_h_diagnostico'; iDiag.placeholder='Diagnóstico'; iDiag.value=item.diagnostico||''
+        const iFecha = document.createElement('input'); iFecha.id='e_h_fecha'; iFecha.type='date'; iFecha.value=item.fecha||''
+        rowB.appendChild(iDet); rowB.appendChild(iDiag); rowB.appendChild(iFecha); root.appendChild(rowB);
+      }, () => {
+        const payload = {
+          id:item.id,
+          pacienteId: Number(document.getElementById('e_h_pacienteSel').value || item.pacienteId),
+          medicoId: Number(document.getElementById('e_h_medicoSel').value || item.medicoId),
+          tratamientoId: (()=>{ const v=document.getElementById('e_h_tratSel').value; return v?Number(v):null })(),
+          detalles: document.getElementById('e_h_detalles').value,
+          diagnostico: document.getElementById('e_h_diagnostico').value,
+          fecha: document.getElementById('e_h_fecha').value
+        }
+        api.historias.update(item.id, payload).then(loadHistorias)
       })
     }
 
